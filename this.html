@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>This, That, These, Those Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      color: white;
+      padding: 20px;
+    }
+    .game-container {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+    .question {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 18px;
+      background-color: white;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: lightgray;
+    }
+    .score {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .question img {
+      max-width: 200px;
+      display: block;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>This, That, These, Those Game</h1>
+    <div class="question" id="question">Select the correct option</div>
+    <img id="questionImage" src="" alt="" style="display: none;">
+    <div class="options">
+      <button onclick="checkAnswer('this')">This</button>
+      <button onclick="checkAnswer('that')">That</button>
+      <button onclick="checkAnswer('these')">These</button>
+      <button onclick="checkAnswer('those')">Those</button>
+    </div>
+    <div class="score">Score: <span id="score">0</span> | Best Score: <span id="bestScore">0</span></div>
+    <p>Time Left: <span id="timeLeft">30</span>s</p>
+    <button onclick="restartGame()">Restart</button>
+  </div>
+  <script>
+    const questions = [
+      { text: "(pointing at a single apple near you) __ is an apple.", answer: "this", image: "" },
+      { text: "(pointing at a single tree far away) __ is a tree.", answer: "that", image: "" },
+      { text: "(showing multiple books near you) __ are books.", answer: "these", image: "" },
+      { text: "(pointing at multiple dogs far away) __ are dogs.", answer: "those", image: "" }
+    ];
+    let score = 0;
+    let bestScore = localStorage.getItem("bestScore") || 0;
+    let timeLeft = 30;
+    let timer;
+
+    document.getElementById("bestScore").innerText = bestScore;
+    function startGame() {
+      timeLeft = 30;
+      score = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("timeLeft").innerText = timeLeft;
+      changeQuestion();
+      timer = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          if (score > bestScore) {
+            localStorage.setItem("bestScore", score);
+            document.getElementById("bestScore").innerText = score;
+          }
+          alert(`Time's up! Your score: ${score}`);
+        } else {
+          timeLeft--;
+          document.getElementById("timeLeft").innerText = timeLeft;
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(answer) {
+      const currentQuestion = document.getElementById("question").dataset.answer;
+      if (answer === currentQuestion) {
+        score++;
+        document.getElementById("score").innerText = score;
+      }
+      changeQuestion();
+    }
+
+    function changeQuestion() {
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      const newQuestion = questions[randomIndex];
+      document.getElementById("question").innerText = newQuestion.text;
+      document.getElementById("question").dataset.answer = newQuestion.answer;
+      document.getElementById("questionImage").src = newQuestion.image;
+      document.getElementById("questionImage").style.display = "block";
+    }
+
+    function restartGame() {
+      clearInterval(timer);
+      startGame();
+    }
+
+    startGame();
+  </script>
+</body>
+</html>

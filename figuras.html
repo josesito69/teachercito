@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shape Matching Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+      color: white;
+      text-align: center;
+    }
+
+    .game-container {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .target-shape {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .shapes-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 80%;
+      margin: auto;
+    }
+
+    .shape {
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .shape:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .circle { border-radius: 50%; }
+    .square { border-radius: 10px; }
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 80px solid;
+    }
+
+    .red { background-color: #ff4b5c; }
+    .blue { background-color: #4b7bff; }
+    .green { background-color: #4bff80; }
+    .yellow { background-color: #ffeb3b; }
+    .orange { background-color: #ff9800; }
+    .purple { background-color: #9c27b0; }
+
+    .correct { background-color: #28a745; padding: 10px; border-radius: 8px; }
+    .incorrect { background-color: #dc3545; padding: 10px; border-radius: 8px; }
+    
+    .retry-btn, .reset-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="target-shape" id="targetShape">Find the red circle!</div>
+    <p>Score: <span id="score">0</span> | Mistakes: <span id="mistakes">0</span></p>
+    <p>Time Left: <span id="timeLeft">30</span>s | Best Score: <span id="bestScore">0</span></p>
+    <div class="shapes-container" id="shapesContainer"></div>
+    <div id="feedback"></div>
+    <button class="retry-btn" onclick="restartGame()">Try Again</button>
+    <button class="reset-btn" onclick="resetBestScore()">Reset Score</button>
+  </div>
+
+  <script>
+    const shapes = ['circle', 'square', 'triangle'];
+    const colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple'];
+    let score = 0;
+    let timeLeft = 30;
+    let timer;
+    let bestScore = localStorage.getItem('bestScore') || 0;
+    document.getElementById('bestScore').innerText = bestScore;
+
+    function generateShapes() {
+      const container = document.getElementById('shapesContainer');
+      container.innerHTML = "";
+      shapes.forEach(shape => {
+        colors.forEach(color => {
+          const div = document.createElement('div');
+          div.className = `shape ${shape} ${color}`;
+          div.addEventListener('click', () => checkMatch(shape, color));
+          container.appendChild(div);
+        });
+      });
+    }
+
+    function checkMatch(shape, color) {
+      const targetShape = document.getElementById('targetShape').innerText.split(' ');
+      const targetColor = targetShape[2];
+      const targetType = targetShape[3].replace('!', '');
+
+      if (shape === targetType && color === targetColor) {
+        score++;
+        document.getElementById('score').innerText = score;
+      }
+      changeTarget();
+    }
+
+    function restartGame() {
+      score = 0;
+      timeLeft = 30;
+      document.getElementById('score').innerText = score;
+      document.getElementById('timeLeft').innerText = timeLeft;
+      clearInterval(timer);
+      startTimer();
+      changeTarget();
+    }
+
+    function resetBestScore() {
+      localStorage.setItem('bestScore', 0);
+      document.getElementById('bestScore').innerText = 0;
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          if (score > bestScore) {
+            localStorage.setItem('bestScore', score);
+            document.getElementById('bestScore').innerText = score;
+          }
+          alert(`Time's up! Your score: ${score}`);
+        } else {
+          timeLeft--;
+          document.getElementById('timeLeft').innerText = timeLeft;
+        }
+      }, 1000);
+    }
+
+    function changeTarget() {
+      const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      document.getElementById('targetShape').innerText = `Find the ${randomColor} ${randomShape}!`;
+
+      // Reorganizing the shapes in random order
+      const container = document.getElementById('shapesContainer');
+      const shapeDivs = Array.from(container.children);
+      for (let i = shapeDivs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        container.appendChild(shapeDivs[j]);
+      }
+    }
+
+    generateShapes();
+    changeTarget();
+    startTimer();
+  </script>
+</body>
+</html>
