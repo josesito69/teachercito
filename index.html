@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Selection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      padding: 50px;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .game-card {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      width: 200px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .game-card:hover {
+      transform: scale(1.1);
+    }
+    .game-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .game-card h2 {
+      margin-top: 10px;
+    }
+    a {
+      text-decoration: none;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Choose Your Game</h1>
+  <div class="container">
+    <a href="figuras.html">
+      <div class="game-card">
+        <img src="shapes-thumbnail.jpg" alt="Shapes Game">
+        <h2>Shape Matching Game</h2>
+      </div>
+    </a>
+    <a href="this.html">
+      <div class="game-card">
+        <img src="this-that-thumbnail.jpg" alt="This That Game">
+        <h2>This, That, These, Those</h2>
+      </div>
+    </a>
+  </div>
+</body>
+</html>
