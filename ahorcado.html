@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Ahorcado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            color: #064635;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1500px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #064635;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0B6E4F;
+        }
+        .word {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            word-spacing: 14px;
+            white-space: pre-wrap;
+            background: #D9F2E6;
+            padding: 10px;
+            display: inline-block;
+            border-radius: 10px;
+        }
+        .letters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .letters button {
+            margin: 5px;
+            padding: 12px;
+            background: #0B6E4F;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            width: 50px;
+        }
+        .letters button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 10px 15px;
+            background: #064635;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2rem;
+        }
+        .buttons button:hover {
+            background: #0B6E4F;
+        }
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.5rem;
+            }
+            .word {
+                font-size: 1.5rem;
+                padding: 8px;
+            }
+            .letters button {
+                padding: 10px;
+                font-size: 1rem;
+                width: 40px;
+            }
+            .buttons button {
+                font-size: 1rem;
+                padding: 8px 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.2rem;
+            }
+            .word {
+                font-size: 1.2rem;
+                padding: 6px;
+            }
+            .letters button {
+                padding: 8px;
+                font-size: 0.9rem;
+                width: 35px;
+            }
+            .buttons button {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">OBJETIVO DEL MFC</h1>
+        <p id="hangman"></p>
+        <p class="word" id="word-display"></p>
+        <div class="letters" id="letters"></div>
+        <p id="message"></p>
+        <div class="buttons">
+            <button onclick="nextPhrase()">SIGUIENTE FRASE</button>
+            <button onclick="restartGame()">VOLVER A INTENTAR</button>
+            <button onclick="showHint()">AYUDA</button>
+            <button onclick="revealFirstWord()">MOSTRAR</button>
+        </div>
+    </div>
+
+    <script>
+        const phrases = [
+            "PROMOVER LOS VALORES HUMANOS Y CRISTIANOS DE LA FAMILIA EN LA COMUNIDAD", 
+            "FORMADORA DE PERSONAS", 
+            "EDUCADORA EN LA FE", 
+            "DEFENSORA DE LA VIDA"
+        ];
+        let phraseIndex = 0;
+        let selectedPhrase;
+        let displayPhrase;
+        let attempts;
+        let hintsUsed = 0;
+        
+        function initializeGame() {
+            selectedPhrase = phrases[phraseIndex];
+            displayPhrase = selectedPhrase.split('').map(char => (char === ' ' ? ' ' : '_'));
+            attempts = 3;
+            hintsUsed = 0;
+            revealInitialLetters();
+            document.getElementById("word-display").textContent = displayPhrase.join(' ');
+            document.getElementById("hangman").textContent = `INTENTOS RESTANTES: ${attempts}`;
+            document.getElementById("message").textContent = "";
+            document.getElementById("letters").innerHTML = "";
+            for (let char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+                let btn = document.createElement("button");
+                btn.textContent = char;
+                btn.onclick = function () {
+                    handleLetterGuess(char, btn);
+                };
+                document.getElementById("letters").appendChild(btn);
+            }
+        }
+        
+        function handleLetterGuess(char, btn) {
+            if (selectedPhrase.includes(char)) {
+                for (let i = 0; i < selectedPhrase.length; i++) {
+                    if (selectedPhrase[i] === char) {
+                        displayPhrase[i] = selectedPhrase[i];
+                    }
+                }
+            } else {
+                attempts--;
+            }
+            btn.disabled = true;
+            document.getElementById("word-display").textContent = displayPhrase.join(' ');
+            document.getElementById("hangman").textContent = `INTENTOS RESTANTES: ${attempts}`;
+            if (!displayPhrase.includes("_")) {
+                document.getElementById("message").textContent = "¡GANASTE!";
+            } else if (attempts === 0) {
+                document.getElementById("message").textContent = `PERDISTE. LA FRASE ERA "${selectedPhrase}"`;
+            }
+        }
+        
+        function revealInitialLetters() {
+            let numToReveal = Math.ceil(selectedPhrase.replace(/ /g, '').length * 0.25);
+            let revealed = 0;
+            while (revealed < numToReveal) {
+                let randomIndex = Math.floor(Math.random() * selectedPhrase.length);
+                if (displayPhrase[randomIndex] === '_' && selectedPhrase[randomIndex] !== ' ') {
+                    displayPhrase[randomIndex] = selectedPhrase[randomIndex];
+                    revealed++;
+                }
+            }
+        }
+        
+        function showHint() {
+            if (hintsUsed < 4) {
+                let hiddenIndices = displayPhrase.map((char, index) => char === '_' ? index : -1).filter(index => index !== -1);
+                if (hiddenIndices.length > 0) {
+                    let randomIndex = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
+                    displayPhrase[randomIndex] = selectedPhrase[randomIndex];
+                    hintsUsed++;
+                    document.getElementById("word-display").textContent = displayPhrase.join(' ');
+                }
+            }
+        }
+        
+        function revealFirstWord() {
+            let words = selectedPhrase.split(" ");
+            let firstWord = words[0];
+            for (let i = 0; i < firstWord.length; i++) {
+                displayPhrase[i] = firstWord[i];
+            }
+            document.getElementById("word-display").textContent = displayPhrase.join(' ');
+        }
+        
+        function nextPhrase() {
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            initializeGame();
+        }
+        
+        function restartGame() {
+            initializeGame();
+        }
+
+        // Función para manejar las teclas del teclado
+        function handleKeyboardInput(event) {
+            const key = event.key.toUpperCase();
+            if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(key)) {
+                const button = Array.from(document.querySelectorAll('#letters button'))
+                    .find(btn => btn.textContent === key);
+                if (button && !button.disabled) {
+                    button.click();
+                }
+            }
+        }
+        
+        // Detectar cuando se presiona una tecla
+        window.addEventListener("keydown", handleKeyboardInput);
+
+        // Iniciar el juego
+        initializeGame();
+    </script>
+</body>
+</html>

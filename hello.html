@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello and Goodbye Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      padding: 20px;
+    }
+    .game-container {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+    .game-board {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 20px;
+    }
+    .questions, .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .question, .answer {
+      background-color: white;
+      color: black;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 200px;
+      text-align: center;
+      user-select: none;
+    }
+    .dragging {
+      opacity: 0.5;
+    }
+    .score {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Greetings and Farewells</h1>
+    <div class="game-board">
+      <div class="questions" id="questions"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+    <div class="score">Score: <span id="score">0</span></div>
+    <button onclick="restartGame()">Restart</button>
+  </div>
+  <script>
+    const questionsData = [
+      { text: "Meeting someone for the first time", answer: "Hello" },
+      { text: "Casual greeting in the morning", answer: "Good morning" },
+      { text: "Greeting a friend in the afternoon", answer: "Good afternoon" },
+      { text: "Greeting someone in the evening", answer: "Good evening" },
+      { text: "Casual greeting to a friend", answer: "Hi" },
+      { text: "Leaving a place and saying farewell", answer: "Goodbye" },
+      { text: "Saying you will see someone again", answer: "See you" },
+      { text: "Wishing someone well before leaving", answer: "Take care" },
+      { text: "Saying you will see someone in a short while", answer: "See you later" },
+      { text: "A formal way to say goodbye", answer: "Farewell" }
+    ];
+    let score = 0;
+
+    function createGameElements() {
+      const questionsContainer = document.getElementById("questions");
+      const answersContainer = document.getElementById("answers");
+      questionsContainer.innerHTML = "";
+      answersContainer.innerHTML = "";
+
+      const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5);
+      const shuffledAnswers = [...questionsData].map(q => q.answer).sort(() => Math.random() - 0.5);
+
+      shuffledQuestions.forEach(q => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.textContent = q.text;
+        div.dataset.answer = q.answer;
+        questionsContainer.appendChild(div);
+      });
+
+      shuffledAnswers.forEach(answer => {
+        const div = document.createElement("div");
+        div.classList.add("answer");
+        div.textContent = answer;
+        div.draggable = true;
+        div.addEventListener("dragstart", dragStart);
+        answersContainer.appendChild(div);
+      });
+    }
+
+    function dragStart(event) {
+      event.dataTransfer.setData("text", event.target.textContent);
+    }
+
+    document.querySelectorAll(".questions").forEach(container => {
+      container.addEventListener("dragover", event => event.preventDefault());
+      container.addEventListener("drop", event => {
+        event.preventDefault();
+        const draggedText = event.dataTransfer.getData("text");
+        const target = event.target;
+        if (target.classList.contains("question") && target.dataset.answer === draggedText) {
+          target.style.backgroundColor = "lightgreen";
+          score++;
+          document.getElementById("score").innerText = score;
+        }
+      });
+    });
+
+    function restartGame() {
+      score = 0;
+      document.getElementById("score").innerText = score;
+      createGameElements();
+    }
+
+    createGameElements();
+  </script>
+</body>
+</html>

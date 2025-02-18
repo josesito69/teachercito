@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting People Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      padding: 20px;
+    }
+    .game-container {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      display: inline-block;
+      max-width: 500px;
+    }
+    .dialogue {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .options button {
+      background-color: white;
+      color: black;
+      border: none;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: lightgray;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Meeting People Game</h1>
+    <div class="dialogue" id="dialogue">You meet someone new. What do you say?</div>
+    <div class="options" id="options"></div>
+  </div>
+  
+  <script>
+    const dialogues = [
+      {
+        text: "You meet someone new. What do you say?",
+        options: [
+          { text: "Hello! Nice to meet you.", next: 1 },
+          { text: "Hey, who are you?", next: 2 }
+        ]
+      },
+      {
+        text: "The person smiles and says, 'Nice to meet you too!' What do you ask next?",
+        options: [
+          { text: "What's your name?", next: 3 },
+          { text: "Where are you from?", next: 4 }
+        ]
+      },
+      {
+        text: "The person looks confused and walks away... Try again!",
+        options: []
+      },
+      {
+        text: "They reply, 'I'm Alex. What's your name?'",
+        options: [
+          { text: "I'm [Your Name]!", next: 5 }
+        ]
+      },
+      {
+        text: "They reply, 'I'm from London. How about you?'",
+        options: [
+          { text: "I'm from [Your City]!", next: 5 }
+        ]
+      },
+      {
+        text: "You have a nice conversation and make a new friend!",
+        options: []
+      }
+    ];
+
+    function loadDialogue(index) {
+      const dialogueContainer = document.getElementById("dialogue");
+      const optionsContainer = document.getElementById("options");
+      dialogueContainer.textContent = dialogues[index].text;
+      optionsContainer.innerHTML = "";
+      
+      dialogues[index].options.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option.text;
+        button.onclick = () => loadDialogue(option.next);
+        optionsContainer.appendChild(button);
+      });
+    }
+    
+    loadDialogue(0);
+  </script>
+</body>
+</html>
