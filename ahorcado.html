@@ -166,7 +166,7 @@
             document.getElementById("hangman").textContent = `INTENTOS RESTANTES: ${attempts}`;
             document.getElementById("message").textContent = "";
             document.getElementById("letters").innerHTML = "";
-            for (let char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+            for (let char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ'?,.") {
                 let btn = document.createElement("button");
                 btn.textContent = char;
                 btn.onclick = function () {
@@ -241,7 +241,7 @@
         // Función para manejar las teclas del teclado
         function handleKeyboardInput(event) {
             const key = event.key.toUpperCase();
-            if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(key)) {
+            if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ'?,.".includes(key)) {
                 const button = Array.from(document.querySelectorAll('#letters button'))
                     .find(btn => btn.textContent === key);
                 if (button && !button.disabled) {
