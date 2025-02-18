@@ -21,7 +21,7 @@
     .game-board {
       display: flex;
       justify-content: center;
-      gap: 50px;
+      gap: 700px;
       margin-top: 20px;
     }
     .questions, .answers {
@@ -46,9 +46,15 @@
       margin-top: 20px;
       font-size: 18px;
     }
+    .menu-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+    }
   </style>
 </head>
 <body>
+  <button class="menu-button" onclick="goToMenu()">Back to Menu</button>
   <div class="game-container">
     <h1>Greetings and Farewells</h1>
     <div class="game-board">
@@ -122,6 +128,9 @@
       score = 0;
       document.getElementById("score").innerText = score;
       createGameElements();
+    }
+    function goToMenu() {
+      window.location.href = "index.html";
     }
 
     createGameElements();
