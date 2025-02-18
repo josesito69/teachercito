@@ -82,6 +82,12 @@
         .buttons button:hover {
             background: #0B6E4F;
         }
+        .menu-button {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          z-index: 10;
+        }
         @media (max-width: 768px) {
             .title {
                 font-size: 1.5rem;
@@ -121,6 +127,7 @@
     </style>
 </head>
 <body>
+  <button class="menu-button" onclick="goToMenu()">Back to Menu</button>
     <div class="container">
         <h1 class="title">USEFUL CLASSROOM EXPRESSIONS</h1>
         <p id="hangman"></p>
@@ -252,6 +259,10 @@
         
         // Detectar cuando se presiona una tecla
         window.addEventListener("keydown", handleKeyboardInput);
+        
+        function goToMenu() {
+            window.location.href = "index.html";
+        }
 
         // Iniciar el juego
         initializeGame();
