@@ -122,25 +122,33 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="title">OBJETIVO DEL MFC</h1>
+        <h1 class="title">USEFUL CLASSROOM EXPRESSIONS</h1>
         <p id="hangman"></p>
         <p class="word" id="word-display"></p>
         <div class="letters" id="letters"></div>
         <p id="message"></p>
         <div class="buttons">
-            <button onclick="nextPhrase()">SIGUIENTE FRASE</button>
-            <button onclick="restartGame()">VOLVER A INTENTAR</button>
-            <button onclick="showHint()">AYUDA</button>
-            <button onclick="revealFirstWord()">MOSTRAR</button>
+            <button onclick="nextPhrase()">NEXT</button>
+            <button onclick="restartGame()">TRY AGAIN</button>
+            <button onclick="showHint()">HELP</button>
+            <button onclick="revealFirstWord()">SHOW</button>
         </div>
     </div>
 
     <script>
         const phrases = [
-            "PROMOVER LOS VALORES HUMANOS Y CRISTIANOS DE LA FAMILIA EN LA COMUNIDAD", 
-            "FORMADORA DE PERSONAS", 
-            "EDUCADORA EN LA FE", 
-            "DEFENSORA DE LA VIDA"
+            "HOW DO YOU SAY?", 
+            "WHAT IS IN SPANISH?", 
+            "CAN YOU REPEAT THAT PLEASE?", 
+            "I DON'T UNDERSTAND",
+            "I'M SORRY, I DON'T REMEMBER", 
+            "THANK YOU", 
+            "YOU'RE WELCOME", 
+            "MAY I COME IN?",
+            "MAY I GO OUT FOR A MOMENT?", 
+            "MAY I GO TO THE RESTROOM?", 
+            "NO SPANISH, PLEASE", 
+            "DON'T SPEAK SPANISH"
         ];
         let phraseIndex = 0;
         let selectedPhrase;
