@@ -46,9 +46,15 @@
       display: block;
       margin: 10px auto;
     }
+    .menu-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
   </style>
 </head>
 <body>
+  <button class="menu-button" onclick="goToMenu()">Back to Menu</button>
   <div class="game-container">
     <h1>This, That, These, Those Game</h1>
     <div class="question" id="question">Select the correct option</div>
@@ -118,6 +124,10 @@
     function restartGame() {
       clearInterval(timer);
       startGame();
+    }
+    
+    function goToMenu() {
+      window.location.href = "index.html";
     }
 
     startGame();
