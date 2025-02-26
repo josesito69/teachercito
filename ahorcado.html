@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Ahorcado</title>
+    <title>hangman game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -170,7 +170,7 @@
             hintsUsed = 0;
             revealInitialLetters();
             document.getElementById("word-display").textContent = displayPhrase.join(' ');
-            document.getElementById("hangman").textContent = `INTENTOS RESTANTES: ${attempts}`;
+            document.getElementById("hangman").textContent = `REMAINING ATTEMPS: ${attempts}`;
             document.getElementById("message").textContent = "";
             document.getElementById("letters").innerHTML = "";
             for (let char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ'?,.") {
