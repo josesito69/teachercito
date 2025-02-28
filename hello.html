@@ -16,15 +16,23 @@
       background: rgba(255, 255, 255, 0.2);
       padding: 20px;
       border-radius: 15px;
-      display: inline-block;
+      width: 90%;
+      max-width: 800px;
+      margin: auto;
+    }
+    .instructions {
+      font-size: 18px;
+      margin-bottom: 20px;
     }
     .game-board {
       display: flex;
-      justify-content: center;
-      gap: 700px;
-      margin-top: 20px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
     }
-    .questions, .answers {
+    .column {
+      flex: 1;
+      min-width: 250px;
       display: flex;
       flex-direction: column;
       gap: 15px;
@@ -32,24 +40,74 @@
     .question, .answer {
       background-color: white;
       color: black;
-      padding: 10px;
+      padding: 12px;
       border-radius: 5px;
       cursor: pointer;
-      width: 200px;
       text-align: center;
+      font-weight: bold;
       user-select: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .answer {
+      border: 2px solid transparent;
+    }
+    .answer:hover {
+      background: #f0f0f0;
     }
     .dragging {
       opacity: 0.5;
+      transform: scale(1.1);
+    }
+    .correct {
+      background: #4caf50 !important;
+      color: white;
+      border: 2px solid #2e7d32;
+    }
+    .incorrect {
+      background: #e57373 !important;
+      color: white;
+      border: 2px solid #c62828;
+    }
+    .highlight {
+      border: 2px dashed #ffffff !important;
     }
     .score {
       margin-top: 20px;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      background: #ff9800;
+      color: white;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #e68900;
     }
     .menu-button {
       position: fixed;
       top: 10px;
       left: 10px;
+    }
+    
+    /* 🟢 RESPONSIVIDAD PARA TELÉFONOS */
+    @media (max-width: 600px) {
+      .game-board {
+        flex-direction: column;
+        align-items: center;
+      }
+      .column {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -57,13 +115,17 @@
   <button class="menu-button" onclick="goToMenu()">Back to Menu</button>
   <div class="game-container">
     <h1>Greetings and Farewells</h1>
+    <p class="instructions">Drag and drop the correct greeting or farewell into its matching description.</p>
     <div class="game-board">
-      <div class="questions" id="questions"></div>
-      <div class="answers" id="answers"></div>
+      <div class="column" id="questions"></div>
+      <div class="column" id="answers"></div>
     </div>
     <div class="score">Score: <span id="score">0</span></div>
-    <button onclick="restartGame()">Restart</button>
+    <div class="buttons">
+      <button onclick="restartGame()">Restart</button>
+    </div>
   </div>
+
   <script>
     const questionsData = [
       { text: "Meeting someone for the first time", answer: "Hello" },
@@ -77,6 +139,7 @@
       { text: "Saying you will see someone in a short while", answer: "See you later" },
       { text: "A formal way to say goodbye", answer: "Farewell" }
     ];
+
     let score = 0;
 
     function createGameElements() {
@@ -84,6 +147,8 @@
       const answersContainer = document.getElementById("answers");
       questionsContainer.innerHTML = "";
       answersContainer.innerHTML = "";
+      score = 0;
+      document.getElementById("score").textContent = score;
 
       const shuffledQuestions = [...questionsData].sort(() => Math.random() - 0.5);
       const shuffledAnswers = [...questionsData].map(q => q.answer).sort(() => Math.random() - 0.5);
@@ -93,6 +158,10 @@
         div.classList.add("question");
         div.textContent = q.text;
         div.dataset.answer = q.answer;
+        div.ondrop = drop;
+        div.ondragover = allowDrop;
+        div.ondragenter = highlight;
+        div.ondragleave = removeHighlight;
         questionsContainer.appendChild(div);
       });
 
@@ -101,34 +170,63 @@
         div.classList.add("answer");
         div.textContent = answer;
         div.draggable = true;
-        div.addEventListener("dragstart", dragStart);
+        div.ondragstart = dragStart;
+        div.ondragend = dragEnd;
         answersContainer.appendChild(div);
       });
     }
 
     function dragStart(event) {
       event.dataTransfer.setData("text", event.target.textContent);
+      setTimeout(() => event.target.classList.add("dragging"), 0);
     }
 
-    document.querySelectorAll(".questions").forEach(container => {
-      container.addEventListener("dragover", event => event.preventDefault());
-      container.addEventListener("drop", event => {
-        event.preventDefault();
-        const draggedText = event.dataTransfer.getData("text");
-        const target = event.target;
-        if (target.classList.contains("question") && target.dataset.answer === draggedText) {
-          target.style.backgroundColor = "lightgreen";
+    function dragEnd(event) {
+      event.target.classList.remove("dragging");
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function highlight(event) {
+      event.preventDefault();
+      event.target.classList.add("highlight");
+    }
+
+    function removeHighlight(event) {
+      event.target.classList.remove("highlight");
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const draggedText = event.dataTransfer.getData("text");
+      const target = event.target;
+      target.classList.remove("highlight");
+
+      if (target.classList.contains("question")) {
+        if (target.dataset.answer === draggedText) {
+          target.classList.add("correct");
+          target.textContent += ` ➝ ${draggedText}`;
           score++;
-          document.getElementById("score").innerText = score;
+        } else {
+          target.classList.add("incorrect");
         }
-      });
-    });
+
+        document.getElementById("score").textContent = score;
+
+        document.querySelectorAll(".answer").forEach(answer => {
+          if (answer.textContent === draggedText) {
+            answer.remove();
+          }
+        });
+      }
+    }
 
     function restartGame() {
-      score = 0;
-      document.getElementById("score").innerText = score;
       createGameElements();
     }
+
     function goToMenu() {
       window.location.href = "index.html";
     }
