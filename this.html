@@ -11,12 +11,17 @@
       background: linear-gradient(to right, #4facfe, #00f2fe);
       color: white;
       padding: 20px;
+      margin: 0;
+      box-sizing: border-box;
     }
     .game-container {
       background: rgba(0, 0, 0, 0.2);
       padding: 20px;
       border-radius: 15px;
       display: inline-block;
+      max-width: 90%;
+      width: 400px;
+      margin: auto;
     }
     .question {
       font-size: 24px;
@@ -24,7 +29,8 @@
     }
     .options button {
       display: block;
-      width: 200px;
+      width: 80%;
+      max-width: 250px;
       margin: 10px auto;
       padding: 10px;
       font-size: 18px;
@@ -50,6 +56,37 @@
       position: absolute;
       top: 10px;
       left: 10px;
+      font-size: 14px;
+      padding: 8px;
+      background-color: #ffffff;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .game-container {
+        width: 95%;
+        padding: 15px;
+      }
+      .question {
+        font-size: 20px;
+      }
+      .options button {
+        font-size: 16px;
+      }
+      .score {
+        font-size: 16px;
+      }
+    }
+    @media (max-width: 400px) {
+      .options button {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .score {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
