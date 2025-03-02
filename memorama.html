@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorama de Adjetivos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 10px;
+            justify-content: center;
+            max-width: 380px;
+            margin: 20px auto;
+        }
+        .card {
+            width: 100%;
+            height: 100px;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        .flipped {
+            background-color: #2ecc71;
+        }
+        .matched {
+            background-color: #f1c40f;
+            cursor: default;
+        }
+        @media (max-width: 500px) {
+            .card {
+                height: 70px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Memorama de Adjetivos</h1>
+    <h2>Pares encontrados: <span id="matchCount">0</span></h2>
+    <div class="grid" id="gameBoard"></div>
+    <script>
+        const adjectives = [
+            { word: "Big", translation: "Grande" },
+            { word: "Small", translation: "Pequeño" },
+            { word: "Happy", translation: "Feliz" },
+            { word: "Sad", translation: "Triste" },
+            { word: "Fast", translation: "Rápido" },
+            { word: "Slow", translation: "Lento" },
+            { word: "Young", translation: "Joven" },
+            { word: "Old", translation: "Viejo" }
+        ];
+        
+        let cards = [...adjectives, ...adjectives.map(a => ({ word: a.translation, translation: a.word }))];
+        cards = cards.sort(() => Math.random() - 0.5);
+        
+        const gameBoard = document.getElementById("gameBoard");
+        const matchCountElement = document.getElementById("matchCount");
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        cards.forEach((adjective) => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.word = adjective.word;
+            card.dataset.translation = adjective.translation;
+            card.textContent = "?";
+            
+            card.addEventListener("click", () => {
+                if (flippedCards.length < 2 && !card.classList.contains("flipped") && !card.classList.contains("matched")) {
+                    card.classList.add("flipped");
+                    card.textContent = adjective.word;
+                    flippedCards.push(card);
+                }
+                
+                if (flippedCards.length === 2) {
+                    setTimeout(() => {
+                        const [card1, card2] = flippedCards;
+                        if ((card1.dataset.word === card2.dataset.translation) || (card2.dataset.word === card1.dataset.translation)) {
+                            flippedCards.forEach(c => c.classList.add("matched"));
+                            matchedPairs++;
+                            matchCountElement.textContent = matchedPairs;
+                            if (matchedPairs === adjectives.length) {
+                                alert("¡Felicidades! Has encontrado todas las parejas.");
+                            }
+                        } else {
+                            flippedCards.forEach(c => {
+                                c.classList.remove("flipped");
+                                c.textContent = "?";
+                            });
+                        }
+                        flippedCards = [];
+                    }, 1000);
+                }
+            });
+            
+            gameBoard.appendChild(card);
+        });
+    </script>
+</body>
+</html>
