@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memorama de Adjetivos</title>
+    <title>adjetive memory</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,8 +45,9 @@
     </style>
 </head>
 <body>
-    <h1>Memorama de Adjetivos</h1>
-    <h2>Pares encontrados: <span id="matchCount">0</span></h2>
+    <h1>adjetive memory</h1>
+    <h2>founnd pairs: <span id="matchCount">0</span></h2>
+    <h2>time: <span id="timer">60</span> seconds</h2>
     <div class="grid" id="gameBoard"></div>
     <script>
         const adjectives = [
@@ -65,9 +66,28 @@
         
         const gameBoard = document.getElementById("gameBoard");
         const matchCountElement = document.getElementById("matchCount");
+        const timerElement = document.getElementById("timer");
         let flippedCards = [];
         let matchedPairs = 0;
+        let timeLeft = 60;
 
+        function startTimer() {
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("¡Tiempo agotado! Intenta de nuevo.");
+                    location.reload();
+                }
+                if (matchedPairs === adjectives.length) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+        
+        startTimer();
+        
         cards.forEach((adjective) => {
             const card = document.createElement("div");
             card.classList.add("card");
