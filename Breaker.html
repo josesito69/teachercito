@@ -3,89 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Click Challenge</title>
+    <title>Compare the Animals!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f4f4f4;
         }
-        .container {
-            margin: 50px auto;
-            width: 80%;
-            max-width: 400px;
+
+        .game-container {
             background: white;
             padding: 20px;
             border-radius: 10px;
+            max-width: 400px;
+            margin: 20px auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            height: 300px;
         }
-        #click-btn {
-            position: absolute;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
+
+        .images img {
+            width: 100px;
+            margin: 10px;
+        }
+
+        .options button {
+            display: block;
+            width: 80%;
+            margin: 5px auto;
+            padding: 10px;
+            font-size: 18px;
             cursor: pointer;
         }
-        #click-btn:hover {
-            background-color: #218838;
-        }
-        #score {
-            font-size: 20px;
-            margin-top: 20px;
+
+        #feedback {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Quick Click Challenge!</h1>
-        <p>Click the moving button as many times as you can in <b>15 seconds!</b></p>
-        <button id="click-btn">Click Me!</button>
+    <div class="game-container">
+        <h1>Compare the Animals!</h1>
+        <p id="question">Which is ______?</p>
+        <div class="images">
+            <img id="img1" src="elephant.png" alt="Animal 1">
+            <img id="img2" src="dog.png" alt="Animal 2">
+        </div>
+        <div class="options">
+            <button onclick="checkAnswer(0)"></button>
+            <button onclick="checkAnswer(1)"></button>
+            <button onclick="checkAnswer(2)"></button>
+        </div>
+        <p id="feedback"></p>
         <p id="score">Score: 0</p>
     </div>
 
     <script>
+        const questions = [
+            { img1: "elephant.png", img2: "dog.png", adjective: "big", answer: "bigger", options: ["bigger", "biggest", "more big"] },
+            { img1: "rabbit.png", img2: "turtle.png", adjective: "fast", answer: "faster", options: ["fastest", "faster", "more fast"] },
+            { img1: "giraffe.png", img2: "cat.png", adjective: "tall", answer: "taller", options: ["tallest", "taller", "more tall"] }
+        ];
+
+        let currentQuestion = 0;
         let score = 0;
-        let timeLeft = 15;
-        let gameActive = true;
-        
-        const button = document.getElementById("click-btn");
-        const scoreDisplay = document.getElementById("score");
 
-        function moveButton() {
-            if (!gameActive) return;
+        function loadQuestion() {
+            let q = questions[currentQuestion];
+            document.getElementById("question").textContent = `Which is ${q.adjective}?`;
+            document.getElementById("img1").src = q.img1;
+            document.getElementById("img2").src = q.img2;
 
-            let x = Math.random() * 80 + "%";
-            let y = Math.random() * 80 + "%";
-
-            button.style.left = x;
-            button.style.top = y;
+            let buttons = document.querySelectorAll(".options button");
+            q.options.forEach((opt, index) => {
+                buttons[index].textContent = opt;
+            });
         }
 
-        button.onclick = function() {
-            if (gameActive) {
+        function checkAnswer(index) {
+            let q = questions[currentQuestion];
+            let selected = q.options[index];
+
+            if (selected === q.answer) {
+                document.getElementById("feedback").textContent = "Correct!";
                 score++;
-                scoreDisplay.textContent = "Score: " + score;
-                moveButton();
+            } else {
+                document.getElementById("feedback").textContent = "Try again!";
             }
-        };
 
-        function startTimer() {
-            let countdown = setInterval(() => {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    gameActive = false;
-                    alert("Time's up! Your final score is: " + score);
-                }
-            }, 1000);
+            document.getElementById("score").textContent = `Score: ${score}`;
+
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                setTimeout(() => {
+                    document.getElementById("feedback").textContent = "";
+                    loadQuestion();
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    alert(`Game Over! Your score is ${score}`);
+                    location.reload();
+                }, 1000);
+            }
         }
 
-        moveButton();
-        startTimer();
+        window.onload = loadQuestion;
     </script>
 </body>
 </html>
