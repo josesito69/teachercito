@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess the Fun Fact!</title>
+    <title>Quick Click Challenge</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,76 +18,74 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: 300px;
         }
-        button {
-            display: block;
-            margin: 10px auto;
-            padding: 10px;
-            background-color: #007bff;
+        #click-btn {
+            position: absolute;
+            padding: 10px 20px;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover {
-            background-color: #0056b3;
+        #click-btn:hover {
+            background-color: #218838;
+        }
+        #score {
+            font-size: 20px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Guess the Fun Fact!</h1>
-        <p id="fact">Loading fact...</p>
-        <div id="options"></div>
-        <p id="result"></p>
-        <button id="next-btn">Next Fact</button>
+        <h1>Quick Click Challenge!</h1>
+        <p>Click the moving button as many times as you can in <b>15 seconds!</b></p>
+        <button id="click-btn">Click Me!</button>
+        <p id="score">Score: 0</p>
     </div>
 
     <script>
-        const facts = [
-            { fact: "I have a pet turtle.", person: "Alice", options: ["Alice", "Bob", "Charlie"] },
-            { fact: "I can play the piano.", person: "Bob", options: ["Alice", "Bob", "Charlie"] },
-            { fact: "I've been to Japan.", person: "Charlie", options: ["Alice", "Bob", "Charlie"] }
-        ];
+        let score = 0;
+        let timeLeft = 15;
+        let gameActive = true;
+        
+        const button = document.getElementById("click-btn");
+        const scoreDisplay = document.getElementById("score");
 
-        let currentFactIndex = 0;
+        function moveButton() {
+            if (!gameActive) return;
 
-        const factElement = document.getElementById("fact");
-        const optionsElement = document.getElementById("options");
-        const resultElement = document.getElementById("result");
-        const nextButton = document.getElementById("next-btn");
+            let x = Math.random() * 80 + "%";
+            let y = Math.random() * 80 + "%";
 
-        function loadFact() {
-            resultElement.textContent = "";
-            nextButton.style.display = "none";
-
-            let factObj = facts[currentFactIndex];
-            factElement.textContent = factObj.fact;
-            optionsElement.innerHTML = "";
-
-            factObj.options.forEach(name => {
-                let button = document.createElement("button");
-                button.textContent = name;
-                button.onclick = () => checkAnswer(name, factObj.person);
-                optionsElement.appendChild(button);
-            });
+            button.style.left = x;
+            button.style.top = y;
         }
 
-        function checkAnswer(selected, correct) {
-            if (selected === correct) {
-                resultElement.textContent = "✅ Correct!";
-            } else {
-                resultElement.textContent = "❌ Wrong! Try again.";
+        button.onclick = function() {
+            if (gameActive) {
+                score++;
+                scoreDisplay.textContent = "Score: " + score;
+                moveButton();
             }
-            nextButton.style.display = "block";
-        }
-
-        nextButton.onclick = () => {
-            currentFactIndex = (currentFactIndex + 1) % facts.length;
-            loadFact();
         };
 
-        loadFact();
+        function startTimer() {
+            let countdown = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    gameActive = false;
+                    alert("Time's up! Your final score is: " + score);
+                }
+            }, 1000);
+        }
+
+        moveButton();
+        startTimer();
     </script>
 </body>
 </html>
