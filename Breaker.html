@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Fun Fact!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin: 50px auto;
+            width: 80%;
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Guess the Fun Fact!</h1>
+        <p id="fact">Loading fact...</p>
+        <div id="options"></div>
+        <p id="result"></p>
+        <button id="next-btn">Next Fact</button>
+    </div>
+
+    <script>
+        const facts = [
+            { fact: "I have a pet turtle.", person: "Alice", options: ["Alice", "Bob", "Charlie"] },
+            { fact: "I can play the piano.", person: "Bob", options: ["Alice", "Bob", "Charlie"] },
+            { fact: "I've been to Japan.", person: "Charlie", options: ["Alice", "Bob", "Charlie"] }
+        ];
+
+        let currentFactIndex = 0;
+
+        const factElement = document.getElementById("fact");
+        const optionsElement = document.getElementById("options");
+        const resultElement = document.getElementById("result");
+        const nextButton = document.getElementById("next-btn");
+
+        function loadFact() {
+            resultElement.textContent = "";
+            nextButton.style.display = "none";
+
+            let factObj = facts[currentFactIndex];
+            factElement.textContent = factObj.fact;
+            optionsElement.innerHTML = "";
+
+            factObj.options.forEach(name => {
+                let button = document.createElement("button");
+                button.textContent = name;
+                button.onclick = () => checkAnswer(name, factObj.person);
+                optionsElement.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            if (selected === correct) {
+                resultElement.textContent = "✅ Correct!";
+            } else {
+                resultElement.textContent = "❌ Wrong! Try again.";
+            }
+            nextButton.style.display = "block";
+        }
+
+        nextButton.onclick = () => {
+            currentFactIndex = (currentFactIndex + 1) % facts.length;
+            loadFact();
+        };
+
+        loadFact();
+    </script>
+</body>
+</html>
