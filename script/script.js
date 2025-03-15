@@ -29,7 +29,7 @@ function loadQuestion() {
     }
 
     clearTimeout(timer);
-    timeLeft = 10;
+    timeLeft = 20;
     document.getElementById("timer").textContent = timeLeft;
     document.getElementById("attempts").textContent = attempts;
 
@@ -98,12 +98,32 @@ function startTimer() {
         }
     }, 1000);
 }
-
 function gameOver() {
     document.getElementById("emoji").textContent = "💀";
     document.getElementById("options").innerHTML = `<p>Game Over! Your score: ${score}</p>`;
     document.getElementById("feedback").textContent = "You have used all your attempts!";
     clearTimeout(timer);
+
+    // Muestra el botón de "Intentar de nuevo"
+    document.getElementById("restartButton").style.display = "block";
 }
+
+function restartGame() {
+    // Reinicia las variables del juego
+    currentQuestion = 0;
+    score = 0;
+    attempts = 5;
+    timeLeft = 20;
+    document.getElementById("score").textContent = score;
+    document.getElementById("attempts").textContent = attempts;
+    document.getElementById("timer").textContent = timeLeft;
+    
+    // Oculta el botón de "Intentar de nuevo"
+    document.getElementById("restartButton").style.display = "none";
+    
+    // Vuelve a cargar la primera pregunta
+    loadQuestion();
+}
+
 
 window.onload = loadQuestion;
