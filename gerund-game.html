@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerund Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #ecf0f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+
+    .game-box {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      display: none;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .lives, .timer {
+      font-weight: bold;
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+
+    .lives {
+      color: #c0392b;
+    }
+
+    .timer {
+      color: #27ae60;
+    }
+
+    .question {
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    .options button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    .options button:hover {
+      background-color: #2980b9;
+    }
+
+    .feedback {
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+
+    .menu-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .menu-button:hover {
+      background-color: #27ae60;
+    }
+
+    .start-restart-buttons {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.5s ease;
+    }
+
+    .start-restart-buttons.centered {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .start-restart-buttons.top-right {
+      top: 20px;
+      right: 20px;
+      left: auto;
+      transform: none;
+      flex-direction: row;
+    }
+
+    .start-button, .restart-button {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #f39c12;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    .start-button:hover, .restart-button:hover {
+      background-color: #e67e22;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="menu-button" onclick="goToMenu()">🏠 Menu</button>
+
+  <!-- Botones Iniciar / Reiniciar -->
+  <div class="start-restart-buttons centered" id="buttonContainer">
+    <button class="start-button" onclick="startGame()">▶️ Start game</button>
+    <button class="restart-button" onclick="restartGame()">🔁 restart Game</button>
+  </div>
+
+  <!-- Juego -->
+  <div class="game-box" id="gameBox">
+    <h1>🎮 Gerund Game</h1>
+    <div class="lives" id="lives">❤️ Lives: 3</div>
+    <div class="timer" id="timer">⏱️ Time left: 10s</div>
+    <div class="question" id="question">Loading...</div>
+    <div class="options">
+      <button id="option1" onclick="checkAnswer(0)">Option 1</button>
+      <button id="option2" onclick="checkAnswer(1)">Option 2</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { sentence: "I enjoy ___ music.", options: ["to listen to", "listening to"], answer: 1 },
+      { sentence: "She avoided ___ the truth.", options: ["telling", "to tell"], answer: 0 },
+      { sentence: "We decided ___ early.", options: ["leaving", "to leave"], answer: 1 },
+      { sentence: "He suggested ___ the train.", options: ["taking", "to take"], answer: 0 },
+      { sentence: "They finished ___ dinner.", options: ["to eat", "eating"], answer: 1 },
+      { sentence: "Do you mind ___ the window?", options: ["to close", "closing"], answer: 1 },
+      { sentence: "He kept ___ during the movie.", options: ["talking", "to talk"], answer: 0 },
+      { sentence: "I miss ___ my friends.", options: ["to see", "seeing"], answer: 1 },
+      { sentence: "She recommended ___ that book.", options: ["reading", "to read"], answer: 0 },
+      { sentence: "They considered ___ abroad.", options: ["moving", "to move"], answer: 0 }
+    ];
+
+    let current = 0;
+    let lives = 3;
+    let timeLeft = 10;
+    let timer;
+
+    function goToMenu() {
+      window.location.href = "index.html";
+    }
+
+    function startGame() {
+      document.getElementById("gameBox").style.display = "block";
+      const buttons = document.getElementById("buttonContainer");
+      buttons.classList.remove("centered");
+      buttons.classList.add("top-right");
+
+      current = 0;
+      lives = 3;
+      updateLives();
+      loadQuestion();
+    }
+
+    function restartGame() {
+      clearInterval(timer);
+      startGame();
+    }
+
+    function updateLives() {
+      document.getElementById("lives").textContent = `❤️ Lives: ${lives}`;
+    }
+
+    function updateTimer() {
+      document.getElementById("timer").textContent = `⏱️ Time left: ${timeLeft}s`;
+    }
+
+    function startTimer() {
+      timeLeft = 10;
+      updateTimer();
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          loseLife("⏰ Time's up!");
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      if (lives <= 0) {
+        endGame("❌ Game Over. You ran out of lives.");
+        return;
+      }
+
+      document.getElementById("feedback").textContent = "";
+      const q = questions[current];
+      document.getElementById("question").textContent = q.sentence;
+      document.getElementById("option1").textContent = q.options[0];
+      document.getElementById("option2").textContent = q.options[1];
+
+      startTimer();
+    }
+
+    function checkAnswer(selected) {
+      clearInterval(timer);
+      const q = questions[current];
+      const feedback = document.getElementById("feedback");
+
+      if (selected === q.answer) {
+        feedback.textContent = "✅ Correct!";
+        feedback.style.color = "green";
+      } else {
+        loseLife("❌ Incorrect!");
+        return;
+      }
+
+      nextQuestion();
+    }
+
+    function loseLife(message) {
+      lives--;
+      updateLives();
+      document.getElementById("feedback").textContent = message;
+      document.getElementById("feedback").style.color = "red";
+      if (lives <= 0) {
+        endGame("❌ Game Over. You ran out of lives.");
+      } else {
+        setTimeout(() => {
+          nextQuestion();
+        }, 1500);
+      }
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        setTimeout(() => {
+          loadQuestion();
+        }, 1000);
+      } else {
+        endGame("🎉 Congratulations! You completed all questions!");
+      }
+    }
+
+    function endGame(message) {
+      document.getElementById("question").textContent = message;
+      document.querySelector(".options").style.display = "none";
+      document.getElementById("timer").style.display = "none";
+    }
+  </script>
+</body>
+</html>
