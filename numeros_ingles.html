@@ -56,6 +56,7 @@
       font-size: 1.2em;
       margin: 10px;
     }
+    
         .button_retun {
             margin: 10px;
             padding: 10px 20px;
@@ -108,6 +109,12 @@
       }
       if (n >= 10) return teens[n - 10];
       return ones[n];
+    }
+
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "en-US";
+      speechSynthesis.speak(utter);
     }
 
     let fullNumbers = [];
@@ -163,6 +170,9 @@
         btn.onclick = () => checkAnswer(opt.en, item.en);
         optionsContainer.appendChild(btn);
       });
+
+      // Pronuncia el número en inglés
+      speak(item.en);
     }
 
     function checkAnswer(selected, correct) {
@@ -170,6 +180,7 @@
         result.textContent = '✅ ¡Correcto!';
         result.style.color = 'green';
         nextBtn.style.display = 'inline-block';
+        speak(correct);
       } else {
         result.textContent = '❌ Intenta de nuevo';
         result.style.color = 'red';
@@ -191,7 +202,7 @@
     function changeLevel(change) {
       level += change;
       if (level < 1) level = 1;
-      const maxLimit = 110; // máximo permitido para evitar sobrepasar fullNumbers
+      const maxLimit = 110; // límite máximo
       if (level * 10 > maxLimit) level = Math.floor(maxLimit / 10);
       updateNumbers();
     }
