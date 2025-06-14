@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego de Números en Inglés</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #1e90ff;
+    }
+
+    #spanish-number {
+      font-size: 2em;
+      margin: 20px;
+    }
+
+    .option-button {
+      background-color: #fff;
+      border: 2px solid #1e90ff;
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+
+    .option-button:hover {
+      background-color: #d0e7ff;
+    }
+
+    #result {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+
+    #next-btn, .level-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 8px;
+      border: 2px solid #1e90ff;
+      background-color: white;
+      margin: 10px;
+    }
+
+    #level-display {
+      font-size: 1.2em;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Aprende los Números en Inglés</h1>
+  <div id="level-display">Nivel: 1 (Números del 1 al 10)</div>
+  <div>
+    <button class="level-btn" onclick="changeLevel(-1)">🔽 Nivel -1</button>
+    <button class="level-btn" onclick="changeLevel(1)">🔼 Nivel +1</button>
+  </div>
+
+  <div id="spanish-number">Uno</div>
+  <div id="options"></div>
+  <div id="result"></div>
+  <button id="next-btn">Siguiente</button>
+
+  <script>
+    function numberToEnglish(n) {
+      const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+      const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+      const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+      if (n === 1000) return "one thousand";
+      if (n >= 100) {
+        const rest = n % 100;
+        const hundredPart = ones[Math.floor(n / 100)] + " hundred";
+        return rest === 0 ? hundredPart : hundredPart + " " + numberToEnglish(rest);
+      }
+      if (n >= 20) {
+        return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? "-" + ones[n % 10] : "");
+      }
+      if (n >= 10) return teens[n - 10];
+      return ones[n];
+    }
+
+    let fullNumbers = [];
+    for (let i = 1; i <= 100; i++) {
+      fullNumbers.push({ es: i.toString(), en: numberToEnglish(i) });
+    }
+    for (let i = 150; i <= 1000; i += 50) {
+      fullNumbers.push({ es: i.toString(), en: numberToEnglish(i) });
+    }
+
+    let level = 1;
+    let max = 10;
+    let current = 0;
+    let numbers = [];
+
+    const spanishNumber = document.getElementById('spanish-number');
+    const optionsContainer = document.getElementById('options');
+    const result = document.getElementById('result');
+    const nextBtn = document.getElementById('next-btn');
+    const levelDisplay = document.getElementById('level-display');
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function updateNumbers() {
+      max = level * 10;
+      const selected = fullNumbers.filter(n => parseInt(n.es) <= max);
+      numbers = shuffle([...selected]);
+      current = 0;
+      updateLevelText();
+      showQuestion();
+    }
+
+    function updateLevelText() {
+      levelDisplay.textContent = `Nivel: ${level} (Números del 1 al ${max})`;
+    }
+
+    function showQuestion() {
+      const item = numbers[current];
+      spanishNumber.textContent = item.es;
+      result.textContent = '';
+      nextBtn.style.display = 'none';
+
+      const options = shuffle([...numbers]).slice(0, 3);
+      if (!options.some(opt => opt.en === item.en)) options[0] = item;
+
+      optionsContainer.innerHTML = '';
+      shuffle(options).forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-button';
+        btn.textContent = opt.en;
+        btn.onclick = () => checkAnswer(opt.en, item.en);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        result.textContent = '✅ ¡Correcto!';
+        result.style.color = 'green';
+        nextBtn.style.display = 'inline-block';
+      } else {
+        result.textContent = '❌ Intenta de nuevo';
+        result.style.color = 'red';
+      }
+    }
+
+    nextBtn.onclick = () => {
+      current++;
+      if (current < numbers.length) {
+        showQuestion();
+      } else {
+        spanishNumber.textContent = '🎉 ¡Muy bien!';
+        optionsContainer.innerHTML = '';
+        result.textContent = 'Has terminado el juego 🎈';
+        nextBtn.style.display = 'none';
+      }
+    };
+
+    function changeLevel(change) {
+      level += change;
+      if (level < 1) level = 1;
+      const maxLimit = 110; // máximo permitido para evitar sobrepasar fullNumbers
+      if (level * 10 > maxLimit) level = Math.floor(maxLimit / 10);
+      updateNumbers();
+    }
+
+    updateNumbers();
+  </script>
+</body>
+</html>

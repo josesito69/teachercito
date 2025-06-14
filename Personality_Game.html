@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personality Traits Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin: 20px;
+    }
+    .score-board {
+      display: flex;
+      justify-content: space-around;
+      margin: 10px;
+      font-size: 1.2rem;
+    }
+    .turn {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .card {
+      width: 100px;
+      height: 140px;
+      background-color: #4682b4;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .card:disabled {
+      background-color: #ccc;
+      cursor: default;
+    }
+    .question-box {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 20px;
+    }
+    .question-box p {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .options button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #87cefa;
+      color: #000;
+    }
+    .options button:hover {
+      background-color: #00bfff;
+    }
+    .audio-control {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .audio-control button {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ffcc00;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Personality Traits Card Game</h1>
+  
+  <div class="audio-control">
+    <button id="toggleMusic">🔊 Music On</button>
+  </div>
+
+  <div class="score-board">
+    <div>Team A: <span id="scoreA">0</span></div>
+    <div>Team B: <span id="scoreB">0</span></div>
+  </div>
+  
+  <div class="turn">Current Turn: <span id="currentTeam">Team A</span></div>
+  <div class="board" id="board"></div>
+
+  <div class="question-box" id="questionBox" style="display:none;">
+    <p id="description"></p>
+    <div class="options">
+      <button id="option1"></button>
+      <button id="option2"></button>
+    </div>
+  </div>
+
+  <!-- Audios -->
+  <audio id="bgMusic" src="background.mp3" loop></audio>
+  <audio id="correctSound" src="correct.mp3"></audio>
+  <audio id="wrongSound" src="wrong.mp3"></audio>
+
+  <script>
+    const traits = [
+      { word: "cheerful", desc: "Always happy and smiling.", wrong: "scary" },
+      { word: "interesting", desc: "Not boring, keeps your attention.", wrong: "sleepy" },
+      { word: "scary", desc: "Makes people feel fear.", wrong: "lovable" },
+      { word: "sleepy", desc: "Feeling like you want to sleep.", wrong: "eager" },
+      { word: "healthy", desc: "In good physical condition.", wrong: "naughty" },
+      { word: "famous", desc: "Known by many people.", wrong: "shy" },
+      { word: "dangerous", desc: "Can cause harm.", wrong: "friendly" },
+      { word: "busy", desc: "Having a lot to do.", wrong: "sleepy" },
+      { word: "careful", desc: "Takes time to avoid mistakes.", wrong: "naughty" },
+      { word: "naughty", desc: "Often behaves badly.", wrong: "brave" },
+      { word: "vain", desc: "Loves how they look too much.", wrong: "modest" },
+      { word: "greedy", desc: "Wants too much for themselves.", wrong: "generous" },
+      { word: "sympathy", desc: "Feels sorry for others.", wrong: "selfish" },
+      { word: "sensitive", desc: "Easily affected by emotions.", wrong: "careless" },
+      { word: "lovable", desc: "Easy to love.", wrong: "scary" },
+      { word: "eager", desc: "Very excited to do something.", wrong: "sleepy" },
+      { word: "brave", desc: "Not afraid of danger.", wrong: "nervous" },
+      { word: "enthusiastic", desc: "Shows a lot of excitement.", wrong: "bored" },
+      { word: "friendly", desc: "Kind and pleasant.", wrong: "mean" },
+      { word: "sociable", desc: "Enjoys being with others.", wrong: "shy" },
+      { word: "outgoing", desc: "Very social and open.", wrong: "quiet" },
+      { word: "nervous", desc: "Worried or afraid about something.", wrong: "brave" }
+    ];
+
+    const board = document.getElementById("board");
+    const questionBox = document.getElementById("questionBox");
+    const description = document.getElementById("description");
+    const option1 = document.getElementById("option1");
+    const option2 = document.getElementById("option2");
+    const scoreA = document.getElementById("scoreA");
+    const scoreB = document.getElementById("scoreB");
+    const currentTeamText = document.getElementById("currentTeam");
+    const bgMusic = document.getElementById("bgMusic");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const toggleMusicBtn = document.getElementById("toggleMusic");
+
+    let currentTeam = "A";
+    let currentIndex = null;
+    let musicPlaying = false;
+
+    traits.forEach((t, i) => {
+      const card = document.createElement("button");
+      card.textContent = `Card ${i + 1}`;
+      card.className = "card";
+      card.onclick = () => {
+        playMusicOnce();
+        showQuestion(i, card);
+      };
+      board.appendChild(card);
+    });
+
+    function showQuestion(index, card) {
+      currentIndex = index;
+      const t = traits[index];
+      description.textContent = t.desc;
+
+      const correct = t.word;
+      const wrong = t.wrong;
+      const shuffled = Math.random() > 0.5 ? [correct, wrong] : [wrong, correct];
+      option1.textContent = shuffled[0];
+      option2.textContent = shuffled[1];
+
+      option1.onclick = () => selectAnswer(shuffled[0] === correct, card);
+      option2.onclick = () => selectAnswer(shuffled[1] === correct, card);
+
+      questionBox.style.display = "flex";
+      board.style.display = "none";
+    }
+
+    function selectAnswer(isCorrect, card) {
+      if (isCorrect) {
+        correctSound.play();
+        if (currentTeam === "A") {
+          scoreA.textContent = parseInt(scoreA.textContent) + 1;
+        } else {
+          scoreB.textContent = parseInt(scoreB.textContent) + 1;
+        }
+        alert("Correct! Point for Team " + currentTeam);
+      } else {
+        wrongSound.play();
+        alert("Wrong answer.");
+      }
+
+      card.disabled = true;
+      questionBox.style.display = "none";
+      board.style.display = "grid";
+
+      currentTeam = currentTeam === "A" ? "B" : "A";
+      currentTeamText.textContent = "Team " + currentTeam;
+
+      checkGameEnd();
+    }
+
+    function checkGameEnd() {
+      const allDisabled = [...document.querySelectorAll(".card")].every(c => c.disabled);
+      if (allDisabled) {
+        let score1 = parseInt(scoreA.textContent);
+        let score2 = parseInt(scoreB.textContent);
+        let winner = score1 > score2 ? "Team A" : score1 < score2 ? "Team B" : "No one, it's a tie!";
+        alert(`Game Over! Winner: ${winner}`);
+      }
+    }
+
+    // Music control
+    function playMusicOnce() {
+      if (!musicPlaying) {
+        bgMusic.volume = 0.3;
+        bgMusic.play();
+        musicPlaying = true;
+      }
+    }
+
+    toggleMusicBtn.onclick = () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        toggleMusicBtn.textContent = "🔊 Music On";
+      } else {
+        bgMusic.pause();
+        toggleMusicBtn.textContent = "🔇 Music Off";
+      }
+    };
+  </script>
+</body>
+</html>
