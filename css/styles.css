@@ -48,6 +48,25 @@ button:hover {
     font-weight: bold;
 }
 
+        .button_retun {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #e74c3c;
+            color: white;
+        }
+        .button_retun:hover {
+            background-color: #c0392b;
+        }
+        .top-left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #2c3e50;
+        }
 /* Responsive Design */
 @media (max-width: 600px) {
     .game-container {
