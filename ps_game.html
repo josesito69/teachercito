@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Floating Plural Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to top left, #f5f7fa, #c3cfe2);
+      overflow: hidden;
+    }
+
+    .game-area {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    #question {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    .option {
+      position: absolute;
+      background-color: #ffffffcc;
+      border: 2px solid #0077cc;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.3s;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .option:hover {
+      background-color: #bbdefb;
+    }
+
+    #score, #timer {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1rem;
+      background: #ffffffbb;
+      padding: 6px 12px;
+      border-radius: 6px;
+      z-index: 3;
+    }
+
+    #timer {
+      top: 50px;
+    }
+
+    #message {
+      position: absolute;
+      bottom: 20px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2e7d32;
+      z-index: 2;
+    }
+
+    #backBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: none;
+      background-color: #f44336;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #instructions, #winModal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      z-index: 10;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    #instructions button, #winModal button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      background-color: #0077cc;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      #question {
+        font-size: 1.4rem;
+      }
+      .option {
+        font-size: 1rem;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="instructions">
+    <h2>Instructions</h2>
+    <p>Match the singular or plural form of the word in the center by clicking the correct floating answer.</p>
+    <p>Answers will move every 2 seconds. Be careful! One wrong answer and your score resets.</p>
+    <p>Get 10 correct answers in a row to win. Good luck!</p>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="winModal" style="display:none">
+    <h2>🎉 You Won!</h2>
+    <p>Congratulations! You completed the game.</p>
+    <p id="finalTime"></p>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
+
+  <div class="game-area">
+    <button id="backBtn" onclick="location.href='index.html'">Back</button>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time: 0s</div>
+    <div id="question">Loading...</div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const wordPairs = [
+      { singular: "Mouse", plural: "Mice" },
+      { singular: "Man", plural: "Men" },
+      { singular: "Woman", plural: "Women" },
+      { singular: "Child", plural: "Children" },
+      { singular: "Leaf", plural: "Leaves" },
+      { singular: "Wolf", plural: "Wolves" },
+      { singular: "Ox", plural: "Oxen" },
+      { singular: "Fox", plural: "Foxes" },
+      { singular: "Goose", plural: "Geese" },
+      { singular: "Tooth", plural: "Teeth" },
+      { singular: "Cactus", plural: "Cacti" },
+      { singular: "Knife", plural: "Knives" }
+    ];
+
+    const gameArea = document.querySelector(".game-area");
+    const questionEl = document.getElementById("question");
+    const messageEl = document.getElementById("message");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const instructions = document.getElementById("instructions");
+    const winModal = document.getElementById("winModal");
+    const finalTimeEl = document.getElementById("finalTime");
+
+    let currentCorrect = "";
+    let score = 0;
+    let intervalId;
+    let startTime;
+    let timerInterval;
+
+    function randomPosition(el) {
+      const maxWidth = window.innerWidth - el.offsetWidth;
+      const maxHeight = window.innerHeight - el.offsetHeight - 100;
+      el.style.left = Math.floor(Math.random() * maxWidth) + "px";
+      el.style.top = Math.floor(Math.random() * maxHeight + 80) + "px";
+    }
+
+    function generateQuestion() {
+      messageEl.textContent = "";
+      const word = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      const askSingular = Math.random() > 0.5;
+      const prompt = askSingular ? word.singular : word.plural;
+      currentCorrect = askSingular ? word.plural : word.singular;
+      questionEl.textContent = `What is the ${askSingular ? "plural" : "singular"} of \"${prompt}\"?`;
+
+      document.querySelectorAll(".option").forEach(opt => opt.remove());
+      const optionsSet = new Set();
+      optionsSet.add(currentCorrect);
+
+      while (optionsSet.size < 6) {
+        const random = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+        const distractor = askSingular ? random.plural : random.singular;
+        if (distractor !== currentCorrect) optionsSet.add(distractor);
+      }
+
+      const options = Array.from(optionsSet);
+      options.forEach(optText => {
+        const btn = document.createElement("div");
+        btn.className = "option";
+        btn.textContent = optText;
+        gameArea.appendChild(btn);
+        randomPosition(btn);
+        btn.onclick = () => handleAnswer(optText);
+      });
+
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        document.querySelectorAll(".option").forEach(opt => randomPosition(opt));
+      }, 2000);
+    }
+
+    function handleAnswer(selected) {
+      if (selected === currentCorrect) {
+        score++;
+        scoreEl.textContent = `Score: ${score}`;
+        if (score >= 10) {
+          clearInterval(intervalId);
+          clearInterval(timerInterval);
+          finalTimeEl.textContent = `You completed the game in ${Math.floor((Date.now() - startTime) / 1000)} seconds.`;
+          winModal.style.display = "block";
+        } else {
+          generateQuestion();
+        }
+      } else {
+        score = 0;
+        scoreEl.textContent = `Score: 0`;
+        messageEl.textContent = "❌ Incorrect! Back to 0.";
+        generateQuestion();
+      }
+    }
+
+    function startGame() {
+      instructions.style.display = "none";
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        timerEl.textContent = `Time: ${Math.floor((Date.now() - startTime) / 1000)}s`;
+      }, 1000);
+      generateQuestion();
+    }
+  </script>
+</body>
+</html>

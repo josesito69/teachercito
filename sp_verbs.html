@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Singular and Plural Game</title>
+  <link rel="stylesheet" href="css/vp_css.css">
+</head>
+<body>
+  <h1>🏆 Match the Plural!</h1>
+  <p>Drag the plural word and drop it on its singular form before time runs out!</p>
+
+  <div class="info-bar">
+    <span>⏱️ Time: <strong id="timer">60</strong>s</span>
+    <span>✅ Correct: <strong id="correctCount">0</strong>/10</span>
+    <span>🥇 Best Time: <strong id="recordTime">--</strong>s</span>
+  </div>
+
+  <div class="game-container">
+    <div class="column" id="plurals"><h2>Plural</h2></div>
+    <div class="column" id="singulars"><h2>Singular</h2></div>
+  </div>
+
+  <div id="message"></div>
+  <button id="restartBtn">🔁 Restart Game</button>
+
+  <script src="script/script_sp.js"></script>
+</body>
+</html>
