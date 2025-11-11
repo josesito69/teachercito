@@ -3,74 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Classroom Objects Challenge</title>
+<title>Classroom Objects – Fill in the Blank Game</title>
 <style>
   body {
     font-family: "Poppins", Arial, sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #c8e6c9, #b3e5fc);
+    background: linear-gradient(135deg, #bbdefb, #c8e6c9);
+    color: #023047;
     margin: 0;
     padding: 0;
-    color: #034159;
+    text-align: center;
   }
   .container {
     max-width: 1000px;
     margin: 40px auto;
-    background: #ffffffd8;
+    background: #ffffffd9;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
   }
   h1 {
-    font-size: 2.5rem;
     color: #01579b;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
   }
   .subtitle {
     font-size: 1.2rem;
     color: #0277bd;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
   }
   .sentence {
+    background: #e1f5fe;
+    border-radius: 10px;
+    padding: 20px;
     font-size: 1.8rem;
     font-weight: bold;
-    background: #e1f5fe;
-    padding: 20px;
-    border-radius: 10px;
     margin: 20px 0;
-    letter-spacing: 1px;
   }
   .hidden {
-    filter: blur(12px);
+    filter: blur(10px);
     user-select: none;
   }
   .teams {
     display: flex;
     justify-content: space-around;
-    margin: 30px 0;
     flex-wrap: wrap;
+    margin-top: 30px;
   }
   .team {
     background: #a7ffeb;
-    border-radius: 15px;
     padding: 20px;
+    border-radius: 15px;
     width: 200px;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.15);
   }
   .team h2 {
-    font-size: 1.5rem;
     color: #004d40;
+    margin-bottom: 5px;
   }
   .score {
     font-size: 2rem;
-    color: #00695c;
+    color: #00796b;
+  }
+  .turn {
+    font-size: 1.3rem;
+    color: #004d40;
+    margin-top: 10px;
   }
   button {
     background: #0288d1;
     color: white;
     border: none;
     padding: 12px 18px;
-    margin: 5px;
+    margin: 8px;
     border-radius: 10px;
     cursor: pointer;
     font-size: 1.1rem;
@@ -79,33 +82,24 @@
   button:hover {
     background: #01579b;
   }
-  .turn {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #004d40;
-  }
   @media (max-width: 600px) {
-    .sentence {
-      font-size: 1.3rem;
-      padding: 15px;
-    }
-    .team {
-      width: 100%;
-      margin-bottom: 15px;
-    }
+    h1 { font-size: 1.8rem; }
+    .sentence { font-size: 1.3rem; padding: 15px; }
+    .team { width: 100%; margin-bottom: 15px; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>🎯 Classroom Objects Challenge</h1>
-  <p class="subtitle">Two teams compete! Guess the sentence correctly to earn points.</p>
-  
+  <h1>✏️ Classroom Objects: Fill in the Blank</h1>
+  <p class="subtitle">Two teams take turns guessing the missing word!</p>
+
   <div class="turn" id="turnDisplay">It's <b>Team A's</b> turn</div>
-  <div class="sentence hidden" id="sentenceDisplay">Click “Show Sentence” to start</div>
+
+  <div class="sentence" id="sentenceDisplay">Click “Next Sentence” to start!</div>
 
   <div class="buttons">
-    <button onclick="showSentence()">Show Sentence</button>
+    <button onclick="showAnswer()">Show Answer</button>
     <button onclick="nextSentence()">Next Sentence</button>
     <button onclick="addPoint('A')">+1 Point Team A</button>
     <button onclick="addPoint('B')">+1 Point Team B</button>
@@ -126,45 +120,46 @@
 
 <script>
 const sentences = [
-  "There is a clock on the wall.",
-  "The teacher writes on the board.",
-  "I have a ruler in my pencil case.",
-  "The scissors are on the desk.",
-  "There are books on the shelf.",
-  "The lights are on the ceiling.",
-  "I use a sharpener for my pencil.",
-  "There is a waste basket near the door.",
-  "The air conditioner is on the wall.",
-  "My backpack is under the desk.",
-  "The computer is next to the keyboard.",
-  "I use a calculator in math class.",
-  "There is a marker on the teacher's desk.",
-  "The glue is in the pencil case.",
-  "I use a pen to write my notes.",
-  "The rubber is next to the notebook.",
-  "There is a calendar on the wall.",
-  "I use paper clips to hold my papers.",
-  "The cutter is on the table.",
-  "There is a smart speaker in the classroom."
+  { sentence: "There is a ___ on the wall.", answer: "clock" },
+  { sentence: "The teacher writes on the ___.", answer: "board" },
+  { sentence: "I have a ___ in my pencil case.", answer: "ruler" },
+  { sentence: "The ___ are on the desk.", answer: "scissors" },
+  { sentence: "There are ___ on the shelf.", answer: "books" },
+  { sentence: "The ___ are on the ceiling.", answer: "lights" },
+  { sentence: "I use a ___ for my pencil.", answer: "sharpener" },
+  { sentence: "There is a ___ near the door.", answer: "waste basket" },
+  { sentence: "The ___ is on the wall.", answer: "air conditioner" },
+  { sentence: "My ___ is under the desk.", answer: "backpack" },
+  { sentence: "The ___ is next to the keyboard.", answer: "computer" },
+  { sentence: "I use a ___ in math class.", answer: "calculator" },
+  { sentence: "There is a ___ on the teacher's desk.", answer: "marker" },
+  { sentence: "The ___ is in the pencil case.", answer: "glue" },
+  { sentence: "I use a ___ to write my notes.", answer: "pen" },
+  { sentence: "The ___ is next to the notebook.", answer: "rubber" },
+  { sentence: "There is a ___ on the wall.", answer: "calendar" },
+  { sentence: "I use ___ to hold my papers.", answer: "paper clips" },
+  { sentence: "The ___ is on the table.", answer: "cutter" },
+  { sentence: "There is a ___ in the classroom.", answer: "smart speaker" }
 ];
 
-let currentSentence = "";
+let currentIndex = 0;
 let currentTeam = "A";
 let scoreA = 0;
 let scoreB = 0;
 
-function showSentence() {
-  const sentenceDisplay = document.getElementById("sentenceDisplay");
-  sentenceDisplay.classList.remove("hidden");
+function nextSentence() {
+  const randomIndex = Math.floor(Math.random() * sentences.length);
+  currentIndex = randomIndex;
+  document.getElementById("sentenceDisplay").textContent = sentences[randomIndex].sentence;
+  document.getElementById("sentenceDisplay").classList.remove("hidden");
+  switchTurn();
 }
 
-function nextSentence() {
+function showAnswer() {
   const sentenceDisplay = document.getElementById("sentenceDisplay");
-  const randomIndex = Math.floor(Math.random() * sentences.length);
-  currentSentence = sentences[randomIndex];
-  sentenceDisplay.textContent = currentSentence;
-  sentenceDisplay.classList.add("hidden");
-  switchTurn();
+  const answer = sentences[currentIndex].answer;
+  sentenceDisplay.textContent = sentences[currentIndex].sentence.replace("___", answer);
+  sentenceDisplay.classList.remove("hidden");
 }
 
 function addPoint(team) {
@@ -190,11 +185,10 @@ function restartGame() {
   document.getElementById("scoreA").textContent = 0;
   document.getElementById("scoreB").textContent = 0;
   document.getElementById("turnDisplay").innerHTML = `It's <b>Team A's</b> turn`;
-  document.getElementById("sentenceDisplay").textContent = "Click “Show Sentence” to start";
-  document.getElementById("sentenceDisplay").classList.add("hidden");
+  document.getElementById("sentenceDisplay").textContent = "Click “Next Sentence” to start!";
 }
 
-nextSentence(); // Start with a random sentence
+nextSentence();
 </script>
 </body>
 </html>
