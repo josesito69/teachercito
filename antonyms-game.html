@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antonyms Game – Unit 1</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 70px 10px 80px;
+  text-align: center;
+}
+
+#question {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #0d47a1;
+}
+
+.option {
+  position: absolute;
+  background: white;
+  border: 2px solid #1976d2;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  transition: transform 0.3s, background 0.3s;
+}
+
+.option:hover {
+  background: #e3f2fd;
+  transform: scale(1.05);
+}
+
+#score, #timer {
+  position: fixed;
+  top: 10px;
+  background: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+
+#score { left: 10px; }
+#timer { right: 10px; }
+
+#message {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#instructions, #winModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.modal h2 {
+  color: #0d47a1;
+}
+
+.modal button {
+  margin-top: 15px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+}
+
+.modal button:hover {
+  background: #0d47a1;
+}
+
+/* 📱 Mobile optimization */
+@media (max-width: 600px) {
+  #question {
+    font-size: 1.3rem;
+  }
+  .option {
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="instructions">
+  <div class="modal">
+    <h2>Antonyms Game</h2>
+    <p>Tap the correct opposite (antonym).</p>
+    <p>⚠️ One mistake resets your score.</p>
+    <p>🏆 Get 10 correct answers in a row.</p>
+    <button onclick="startGame()">Start</button>
+  </div>
+</div>
+
+<div id="winModal" style="display:none">
+  <div class="modal">
+    <h2>🎉 Great Job!</h2>
+    <p>You completed the game.</p>
+    <p id="finalTime"></p>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
+</div>
+
+<div class="game-area">
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 0s</div>
+  <div id="question"></div>
+  <div id="message"></div>
+</div>
+
+<script>
+const antonyms = [
+  ["noisy", "quiet"],
+  ["thin", "fat"],
+  ["clean", "dirty"],
+  ["cheap", "expensive"],
+  ["hot", "cold"],
+  ["big", "little"],
+  ["poor", "rich"],
+  ["smart", "foolish"],
+  ["old", "young"],
+  ["easy", "difficult"],
+  ["dry", "wet"],
+  ["fast", "slow"],
+  ["bad", "good"],
+  ["long", "short"],
+  ["strong", "weak"],
+  ["beautiful", "ugly"],
+  ["handsome", "ugly"]
+];
+
+const gameArea = document.querySelector(".game-area");
+const questionEl = document.getElementById("question");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const messageEl = document.getElementById("message");
+const instructions = document.getElementById("instructions");
+const winModal = document.getElementById("winModal");
+const finalTimeEl = document.getElementById("finalTime");
+
+let correctAnswer = "";
+let score = 0;
+let startTime;
+let moveInterval;
+let timerInterval;
+
+function randomPosition(el) {
+  const maxX = window.innerWidth - el.offsetWidth;
+  const maxY = window.innerHeight - el.offsetHeight - 120;
+  el.style.left = Math.random() * maxX + "px";
+  el.style.top = Math.random() * maxY + 80 + "px";
+}
+
+function generateQuestion() {
+  messageEl.textContent = "";
+  document.querySelectorAll(".option").forEach(o => o.remove());
+
+  const pair = antonyms[Math.floor(Math.random() * antonyms.length)];
+  const showFirst = Math.random() > 0.5;
+
+  questionEl.textContent = `Opposite of: "${showFirst ? pair[0] : pair[1]}"`;
+  correctAnswer = showFirst ? pair[1] : pair[0];
+
+  const options = new Set([correctAnswer]);
+
+  while (options.size < 5) {
+    const randomPair = antonyms[Math.floor(Math.random() * antonyms.length)];
+    options.add(randomPair[Math.floor(Math.random() * 2)]);
+  }
+
+  options.forEach(word => {
+    const btn = document.createElement("div");
+    btn.className = "option";
+    btn.textContent = word;
+    btn.onclick = () => checkAnswer(word);
+    gameArea.appendChild(btn);
+    randomPosition(btn);
+  });
+
+  clearInterval(moveInterval);
+  moveInterval = setInterval(() => {
+    document.querySelectorAll(".option").forEach(opt => randomPosition(opt));
+  }, 2500);
+}
+
+function checkAnswer(answer) {
+  if (answer === correctAnswer) {
+    score++;
+    scoreEl.textContent = "Score: " + score;
+    if (score === 10) {
+      clearInterval(moveInterval);
+      clearInterval(timerInterval);
+      finalTimeEl.textContent = "Time: " + Math.floor((Date.now() - startTime)/1000) + " seconds";
+      winModal.style.display = "flex";
+    } else {
+      generateQuestion();
+    }
+  } else {
+    score = 0;
+    scoreEl.textContent = "Score: 0";
+    messageEl.textContent = "❌ Try again!";
+    generateQuestion();
+  }
+}
+
+function startGame() {
+  instructions.style.display = "none";
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    timerEl.textContent = "Time: " + Math.floor((Date.now() - startTime)/1000) + "s";
+  }, 1000);
+  generateQuestion();
+}
+</script>
+
+</body>
+</html>
